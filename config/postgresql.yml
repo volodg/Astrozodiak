@@ -1,0 +1,33 @@
+# NOTE: These settings can be overridden by environment variables as well, in
+# particular:
+#
+#    PGHOST
+#    PGPORT
+#    PGUSER
+#    PGPASS
+#    PGDATABASE
+
+Default: &defaults
+  user: vladimirgorbenko
+  password: H4d3yl8x
+  host: localhost
+  port: 5432
+  database: Astrozodiak
+  poolsize: 10
+
+Development:
+  <<: *defaults
+
+Testing:
+  database: Astrozodiak_test
+  <<: *defaults
+
+Staging:
+  database: Astrozodiak_staging
+  poolsize: 100
+  <<: *defaults
+
+Production:
+  database: Astrozodiak_production
+  poolsize: 100
+  <<: *defaults
