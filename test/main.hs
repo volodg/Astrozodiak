@@ -12,6 +12,8 @@ import Application (makeFoundation)
 
 import HomeTest
 
+-- wget -qO- http://localhost:3000/api?r=1 | sed -e 's/$//'
+
 main :: IO ()
 main = do
     conf <- Yesod.Default.Config.loadConfig $ (configSettings Testing)
