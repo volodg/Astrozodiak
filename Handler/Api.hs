@@ -34,10 +34,10 @@ firstCommand = evaluate $ toJSON (last []::[String])
 secondCommand :: IO Value
 secondCommand = return $ toJSON ("2 command"::String)
 
-hamdlerByCmd :: Text -> Maybe (IO Value)
-hamdlerByCmd "1" = Just firstCommand
-hamdlerByCmd "2" = Just secondCommand
-hamdlerByCmd _ = Nothing
+handlerByCmd :: Text -> Maybe (IO Value)
+handlerByCmd "1" = Just firstCommand
+handlerByCmd "2" = Just secondCommand
+handlerByCmd _ = Nothing
 
 exceptionHandler :: SomeException -> IO Value
 exceptionHandler (SomeException e) = return $ toJSON $ Status (fromEnum UnhandledException) errorDesc Nothing where
@@ -46,18 +46,16 @@ exceptionHandler (SomeException e) = return $ toJSON $ Status (fromEnum Unhandle
 wrapStatusOK :: Value -> Value
 wrapStatusOK val = toJSON $ Status (fromEnum Success) "ok" (Just val)
 
-routeByParam :: Maybe Text -> IO Value
-routeByParam (Just cmd) = do
-    case hamdlerByCmd cmd of
+handlerByParam :: Maybe Text -> IO Value
+handlerByParam (Just cmd) = do
+    case handlerByCmd cmd of
         Just handler -> do
             handle exceptionHandler (wrapStatusOK <$> handler)
         Nothing -> return $ toJSON $ Status (fromEnum UnsupportedCmd) msg Nothing where
             msg = foldl append (pack "") [pack "command: ", cmd, pack " is unsupported"]
 
-routeByParam Nothing = return $ toJSON $ Status (fromEnum NoCmd) "parameter \"r={some_command}\" is required" Nothing
+handlerByParam Nothing = return $ toJSON $ Status (fromEnum NoCmd) "parameter \"r={some_command}\" is required" Nothing
 
 getApiR :: Handler Value
 getApiR = do
-    param  <- lookupGetParam "r"
-    result <- liftIO $ routeByParam param
-    returnJson $ result
+    lookupGetParam "r" >>= liftIO . handlerByParam >>= returnJson
