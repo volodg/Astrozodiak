@@ -6,11 +6,14 @@
 
 module Handler.Api (getApiR) where
 
+import Handler.Common (StatusCode(Success,NoCmd,UnsupportedCmd,UnhandledException))
+import Handler.DreamBook (dreamBookAutocomplete)
+
+import Yesod.Core.Types (HandlerT(HandlerT), unHandlerT)
 import Data.Text (Text, pack, append)
 import Yesod (ToJSON, Value, toJSON, (.=), object, returnJson, lookupGetParam, liftIO)
 import Prelude hiding (head, init, readFile, tail, writeFile) -- , last
 import Foundation (Handler)
-import Handler.Common (StatusCode(Success,NoCmd,UnsupportedCmd,UnhandledException))
 import Data.Typeable (typeOf)
 import Control.Exception (SomeException(SomeException), evaluate, handle)
 import Control.Applicative ((<$>))
@@ -28,13 +31,14 @@ instance ToJSON Status where
         , "data"    .= content
         ]
 
-firstCommand :: IO Value
-firstCommand = evaluate $ toJSON (last []::[String])
+firstCommand :: Handler Value
+firstCommand = liftIO $ evaluate $ toJSON (last []::[String])
 
-secondCommand :: IO Value
+secondCommand :: Handler Value
 secondCommand = return $ toJSON ("2 command"::String)
 
-handlerByCmd :: Text -> Maybe (IO Value)
+handlerByCmd :: Text -> Maybe (Handler Value)
+handlerByCmd "parse/dreambookautocomplete" = Just dreamBookAutocomplete
 handlerByCmd "1" = Just firstCommand
 handlerByCmd "2" = Just secondCommand
 handlerByCmd _ = Nothing
@@ -46,11 +50,11 @@ exceptionHandler (SomeException e) = return $ toJSON $ Status (fromEnum Unhandle
 wrapStatusOK :: Value -> Value
 wrapStatusOK val = toJSON $ Status (fromEnum Success) "ok" (Just val)
 
-handlerByParam :: Maybe Text -> IO Value
+handlerByParam :: Maybe Text -> Handler Value
 handlerByParam (Just cmd) = do
     case handlerByCmd cmd of
         Just handler -> do
-            handle exceptionHandler (wrapStatusOK <$> handler)
+            HandlerT (\d -> do handle exceptionHandler (unHandlerT (wrapStatusOK <$> handler) d))
         Nothing -> return $ toJSON $ Status (fromEnum UnsupportedCmd) msg Nothing where
             msg = foldl append (pack "") [pack "command: ", cmd, pack " is unsupported"]
 
@@ -58,4 +62,4 @@ handlerByParam Nothing = return $ toJSON $ Status (fromEnum NoCmd) "parameter \"
 
 getApiR :: Handler Value
 getApiR = do
-    lookupGetParam "r" >>= liftIO . handlerByParam >>= returnJson
+    lookupGetParam "r" >>= handlerByParam >>= returnJson
