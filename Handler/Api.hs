@@ -11,8 +11,8 @@ import Handler.DreamBook (dreamBookAutocomplete, getDreamBook)
 
 import Yesod.Core.Types (HandlerT(HandlerT), unHandlerT)
 import Data.Text (Text, pack, append)
-import Yesod (ToJSON, Value, toJSON, returnJson, lookupGetParam, liftIO)
-import Prelude hiding (head, init, readFile, tail, writeFile) -- , last
+import Yesod (Value, toJSON, returnJson, lookupGetParam, liftIO)
+import Prelude hiding (head, init, readFile, tail, writeFile)
 import Foundation (Handler)
 import Data.Typeable (typeOf)
 import Control.Exception (SomeException(SomeException), evaluate, handle)
