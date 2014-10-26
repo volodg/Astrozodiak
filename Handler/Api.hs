@@ -6,8 +6,8 @@
 
 module Handler.Api (getApiR) where
 
-import Handler.Common (StatusCode(Success,NoCmd,UnsupportedCmd,UnhandledException))
-import Handler.DreamBook (dreamBookAutocomplete)
+import Handler.Common (Status(..), StatusCode(Success,NoCmd,UnsupportedCmd,UnhandledException))
+import Handler.DreamBook (dreamBookAutocomplete, getDreamBook)
 
 import Yesod.Core.Types (HandlerT(HandlerT), unHandlerT)
 import Data.Text (Text, pack, append)
@@ -18,19 +18,6 @@ import Data.Typeable (typeOf)
 import Control.Exception (SomeException(SomeException), evaluate, handle)
 import Control.Applicative ((<$>))
 
-data Status = Status Int Text (Maybe Value)
-    -- { status  :: Int
-    -- , message :: Text
-    -- , content :: Maybe Value
-    -- }
-
-instance ToJSON Status where
-    toJSON (Status status message content) = object
-        [ "status"  .= status
-        , "message" .= message
-        , "data"    .= content
-        ]
-
 firstCommand :: Handler Value
 firstCommand = liftIO $ evaluate $ toJSON (last []::[String])
 
@@ -39,6 +26,7 @@ secondCommand = return $ toJSON ("2 command"::String)
 
 handlerByCmd :: Text -> Maybe (Handler Value)
 handlerByCmd "parse/dreambookautocomplete" = Just dreamBookAutocomplete
+handlerByCmd "parse/getdream" = Just getDreamBook
 handlerByCmd "1" = Just firstCommand
 handlerByCmd "2" = Just secondCommand
 handlerByCmd _ = Nothing

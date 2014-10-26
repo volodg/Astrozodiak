@@ -13,7 +13,7 @@ Dream
     word Text
     context Text
     language Text
-    type Text
+    dreamType Text
     deriving Eq Ord Show
 
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

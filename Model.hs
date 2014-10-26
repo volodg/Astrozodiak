@@ -12,3 +12,10 @@ import Prelude
 -- http://www.yesodweb.com/book/persistent/
 share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")
+
+instance ToJSON Dream where
+    toJSON (Dream word context _ dreamType) = object
+        [ "word"    .= word
+        , "context" .= context
+        , "type"    .= dreamType
+        ]
