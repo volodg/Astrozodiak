@@ -15,10 +15,10 @@ import Text.Read (readMaybe)
 import Data.Maybe (fromMaybe)
 import Data.Text (Text, pack, unpack, append)
 import Prelude hiding (head, init, last, readFile, tail, writeFile)
-import Yesod (Value, returnJson, object, lookupGetParam, runDB)
+import Yesod (Value, toJSON, returnJson, lookupGetParam, runDB)
 import qualified Database.Esqueleto as E
 
-import Handler.Common (StatusCode(InvalidParameters))
+import Handler.Common (Status(..), StatusCode(InvalidParameters))
 
 import Model
 

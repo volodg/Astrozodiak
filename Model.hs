@@ -14,8 +14,8 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"]
     $(persistFileWith lowerCaseSettings "config/models")
 
 instance ToJSON Dream where
-    toJSON (Dream word context _ dreamType) = object
+    toJSON (Dream word context _ dreamTypeFld) = object
         [ "word"    .= word
         , "context" .= context
-        , "type"    .= dreamType
+        , "type"    .= dreamTypeFld
         ]
