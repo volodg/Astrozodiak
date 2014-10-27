@@ -8,8 +8,8 @@
 #    PGDATABASE
 
 Default: &defaults
-  user: vladimirgorbenko
-  password: H4d3yl8x
+  user: ******
+  password: ******
   host: localhost
   port: 5432
   database: Astrozodiak
