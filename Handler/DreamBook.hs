@@ -22,6 +22,7 @@ import Handler.Common (Status(..), StatusCode(InvalidParameters))
 
 import Model
 
+-- data - https://docs.google.com/spreadsheets/d/1QEVJvwrRpGvuvVh2XAKaNQWem5HwYh7q9D7Cs9-2lFE/edit#gid=0
 -- TODO add language parameter
 
 ilike :: forall a b c. E.SqlExpr (E.Value a) -> E.SqlExpr (E.Value b) -> E.SqlExpr (E.Value c)
@@ -52,7 +53,7 @@ getDreamBook :: Handler Value
 getDreamBook = do
     wordOpt <- lookupGetParam "word"
     case wordOpt of
-        Nothing -> return $ toJSON $ Status (fromEnum InvalidParameters) "word argument not specified" Nothing
+        Nothing -> return $ toJSON $ Status (fromEnum InvalidParameters) "'word' argument not specified" Nothing
         Just word -> do
             resp <- runDB $ E.select $
                 E.from $ \dream -> do
