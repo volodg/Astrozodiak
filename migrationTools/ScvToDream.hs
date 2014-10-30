@@ -38,21 +38,23 @@ closeConn pool = do
     putStrLn "stop"
     destroyAllResources pool
 
+putToDBForever :: (MonadResource m) => ConnectionPool -> Maybe Int64 -> Sink (Int64, Dream) m (Maybe Int64)
+putToDBForever pool lastID = do
+    dreamWithID <- await
+    case dreamWithID of
+        Just (dreamID, dream) -> do
+            liftIO $ flip runSqlPool pool $ repsert (toSqlKey dreamID) dream
+            putToDBForever pool $ Just dreamID
+        Nothing -> return lastID
+
 sink :: MonadResource m => Sink (Int64, Dream) m () -- consumes a stream of Strings, no result
 sink = do
     (_releaseKey, pool) <- allocate openConn closeConn
-    awaitForever $ \dreamWithID -> do
-        let dreamIDField = fst dreamWithID
-        let dreamVal     = snd dreamWithID
-
-        liftIO $ do
-            flip runSqlPool pool $ repsert (toSqlKey dreamIDField) dreamVal
-    -- TODO remove items
-
-    -- liftIO $ do
-    --     flip runSqlPool pool $ do
-    --         delete lastKey
-
+    res <- putToDBForever pool Nothing
+    liftIO $ do
+        case res of
+            Just key -> flip runSqlPool pool $ deleteWhere [DreamId >. (toSqlKey key)]
+            Nothing -> return ()
     return ()
 
 csvRawToDream :: MapRow T.Text -> Int64 -> Maybe (Int64, Dream)
