@@ -1,7 +1,9 @@
-{-# LANGUAGE TupleSections, OverloadedStrings #-}
+{-# LANGUAGE TupleSections, OverloadedStrings, RankNTypes #-}
 module Handler.Home where
 
 import Import
+import Control.Monad.Catch (MonadThrow)
+import Text.Blaze (ToMarkup)
 import Yesod.Form.Bootstrap3
     ( BootstrapFormLayout (..), renderBootstrap3, withSmallInput )
 
@@ -17,10 +19,7 @@ getHomeR = do
     (formWidget, formEnctype) <- generateFormPost sampleForm
     let submission = Nothing :: Maybe (FileInfo, Text)
         handlerName = "getHomeR" :: Text
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+    defaultLayout $ homepageFileWidget formWidget formEnctype submission handlerName
 
 postHomeR :: Handler Html
 postHomeR = do
@@ -30,10 +29,19 @@ postHomeR = do
             FormSuccess res -> Just res
             _ -> Nothing
 
-    defaultLayout $ do
-        aDomId <- newIdent
-        setTitle "Welcome To Yesod!"
-        $(widgetFile "homepage")
+    defaultLayout $ homepageFileWidget formWidget formEnctype submission handlerName
+
+homepageFileWidget :: forall (m :: * -> *) a a1 a2 a3.
+                            (MonadThrow m,
+                             ToMarkup a2,
+                             ToMarkup a1,
+                             ToMarkup a, MonadBaseControl IO m,
+                             MonadIO m, ToWidget App a3) =>
+                            a3 -> a2 -> Maybe (FileInfo, a1) -> a -> WidgetT App m ()
+homepageFileWidget formWidget formEnctype submission handlerName = do
+    aDomId <- newIdent
+    setTitle "Welcome To Yesod!"
+    $(widgetFile "homepage")
 
 sampleForm :: Form (FileInfo, Text)
 sampleForm = renderBootstrap3 BootstrapBasicForm $ (,)

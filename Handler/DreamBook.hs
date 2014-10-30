@@ -1,10 +1,8 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE TemplateHaskell   #-}
-{-# LANGUAGE TypeFamilies      #-}
-{-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE FlexibleContexts #-}
-{-# LANGUAGE GADTs #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE TypeFamilies          #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Handler.DreamBook (dreamBookAutocomplete, getDreamBook) where
@@ -33,7 +31,7 @@ sqlSelect Nothing _ = return []
 sqlSelect (Just term) limit = do
     entities <- runDB $ E.selectDistinct $
                 E.from $ \dream -> do
-                E.where_ (dream E.^. DreamWord `ilike` (E.val $ append term (pack "%")))
+                E.where_ $ dream E.^. DreamWord `ilike` E.val (append term (pack "%"))
                 E.orderBy [E.asc (dream E.^. DreamWord)]
                 E.limit $ fromIntegral limit
                 return $ dream E.^. DreamWord
@@ -57,6 +55,6 @@ getDreamBook = do
         Just word -> do
             resp <- runDB $ E.select $
                 E.from $ \dream -> do
-                E.where_ (dream E.^. DreamWord E.==. (E.val word))
-                return $ dream
+                E.where_ (dream E.^. DreamWord E.==. E.val word)
+                return dream
             returnJson $ toJSON (map (\(E.Entity _ v) -> v) resp)

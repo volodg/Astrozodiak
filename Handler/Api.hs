@@ -1,6 +1,4 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE QuasiQuotes       #-}
-{-# LANGUAGE TemplateHaskell   #-}
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
@@ -33,21 +31,20 @@ handlerByCmd _ = Nothing
 
 exceptionHandler :: SomeException -> IO Value
 exceptionHandler (SomeException e) = return $ toJSON $ Status (fromEnum UnhandledException) errorDesc Nothing where
-    errorDesc = pack $ (show (typeOf e) ++ ":" ++ show e)
+    errorDesc = pack (show (typeOf e) ++ ":" ++ show e)
 
 wrapStatusOK :: Value -> Value
 wrapStatusOK val = toJSON $ Status (fromEnum Success) "ok" (Just val)
 
 handlerByParam :: Maybe Text -> Handler Value
-handlerByParam (Just cmd) = do
+handlerByParam (Just cmd) =
     case handlerByCmd cmd of
-        Just handler -> do
-            HandlerT (\d -> do handle exceptionHandler (unHandlerT (wrapStatusOK <$> handler) d))
+        Just handler ->
+            HandlerT (handle exceptionHandler . unHandlerT (wrapStatusOK <$> handler))
         Nothing -> return $ toJSON $ Status (fromEnum UnsupportedCmd) msg Nothing where
             msg = foldl append (pack "") [pack "command: ", cmd, pack " is unsupported"]
 
 handlerByParam Nothing = return $ toJSON $ Status (fromEnum NoCmd) "parameter \"r={some_command}\" is required" Nothing
 
 getApiR :: Handler Value
-getApiR = do
-    lookupGetParam "r" >>= handlerByParam >>= returnJson
+getApiR = lookupGetParam "r" >>= handlerByParam >>= returnJson

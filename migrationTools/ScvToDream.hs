@@ -24,14 +24,8 @@ import GHC.Int
 
 connStr = "host=localhost dbname=Astrozodiak user=vladimirgorbenko password=H4d3yl8x port=5432"
 
---forall a. 
 openConn :: IO ConnectionPool
-openConn = do
-    putStrLn "start"
-    pool <- runStdoutLoggingT $ do
-        pool <- createPostgresqlPool connStr 10
-        return pool
-    return pool
+openConn = putStrLn "start" >> (runStdoutLoggingT $ createPostgresqlPool connStr 10)
 
 closeConn :: ConnectionPool -> IO ()
 closeConn pool = do
@@ -51,10 +45,9 @@ sink :: MonadResource m => Sink (Int64, Dream) m () -- consumes a stream of Stri
 sink = do
     (_releaseKey, pool) <- allocate openConn closeConn
     res <- putToDBForever pool Nothing
-    liftIO $ do
-        case res of
-            Just key -> flip runSqlPool pool $ deleteWhere [DreamId >. (toSqlKey key)]
-            Nothing -> return ()
+    liftIO $ case res of
+        Just key -> flip runSqlPool pool $ deleteWhere [DreamId >. toSqlKey key]
+        Nothing -> return ()
     return ()
 
 csvRawToDream :: MapRow T.Text -> Int64 -> Maybe (Int64, Dream)
@@ -71,7 +64,7 @@ toDream lineNum = do
     case lineOpt of
         Just line -> do
             case csvRawToDream line lineNum of
-                Just el -> yield $ el
+                Just el -> yield el
                 Nothing -> liftIO $ putStrLn $ "can not parse line: " ++ show line
             toDream (lineNum + 1)
         _ -> return ()
@@ -79,7 +72,7 @@ toDream lineNum = do
 csvToDB = runResourceT $
   CB.sourceFile "DreamBook-ru.csv" $=
   intoCSV defCSVSettings $=
-  (toDream 1) $$
+  toDream 1 $$
   sink
 
 main = csvToDB

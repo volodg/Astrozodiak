@@ -1,21 +1,18 @@
 {-# LANGUAGE OverloadedStrings #-}
 module TestImport
-    ( module Yesod.Test
-    , module Model
-    , module Foundation
-    , module Database.Persist
-    , runDB
-    , Spec
-    , Example
-    ) where
+ (runDB,
+  Spec,
+  Example,
+  module X
+  ) where
 
-import Yesod.Test
-import Database.Persist hiding (get)
+import Yesod.Test as X
+import Database.Persist as X hiding (get)
 import Database.Persist.Sql (SqlPersistM, runSqlPersistMPool)
 import Control.Monad.IO.Class (liftIO)
 
-import Foundation
-import Model
+import Foundation as X
+import Model as X
 
 type Spec = YesodSpec App
 type Example = YesodExample App
