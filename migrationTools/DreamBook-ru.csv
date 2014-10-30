@@ -1,10 +1,11 @@
 word,context,type,url
-1,"Сон, sdfsd",Сонник,
-word,context,type,url
-2,AAAA,sadfasd,
-3,BBBB,asdfasd,
-4,adf,asdfasdf,
-5,asdfasd,asdfds,
-6,asdfasd,asdfasdf,
-7,asdfasdf,asdfsadf,
-8,asdfasdfasd,asdfasdf,
+aaa,"Сон, sdfsd",Сонник,
+bbb,context,type,url
+ccc,AAAA,sadfasd,
+444,BBBB,asdfasd,
+555,adf,asdfasdf,
+666,asdfasd,asdfds,
+777,asdfasd,asdfasdf,
+888,asdfasdf,asdfsadf,
+999,asdfasdfasd,asdfasdf,
+000,asdfasdfasd,asdfasdf,
