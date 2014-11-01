@@ -6,26 +6,26 @@ module Main where
 -- Dream Book
 -- https://docs.google.com/spreadsheets/d/1QEVJvwrRpGvuvVh2XAKaNQWem5HwYh7q9D7Cs9-2lFE/edit#gid=0
 
-import Control.Monad.Trans.Resource --(MonadResource, allocate)
-import Control.Monad.Trans.Class
-import Control.Monad.IO.Class --(liftIO)
-import qualified Data.Conduit.Binary as CB
-import qualified Data.Text as T
-import qualified Data.Map as DM
-import Data.CSV.Conduit
-import Data.Conduit
-import Control.Monad.Logger (runStdoutLoggingT)
-import Database.Persist.Postgresql
-import Data.Pool (destroyAllResources)
-import Model
-import Database.Persist
-import qualified Database.Esqueleto as E
-import GHC.Int
+import           Control.Monad.IO.Class
+import           Control.Monad.Logger         (runStdoutLoggingT)
+import           Control.Monad.Trans.Class
+import           Control.Monad.Trans.Resource
+import           Data.Conduit
+import qualified Data.Conduit.Binary          as CB
+import           Data.CSV.Conduit
+import qualified Data.Map                     as DM
+import           Data.Pool                    (destroyAllResources)
+import qualified Data.Text                    as T
+import qualified Database.Esqueleto           as E
+import           Database.Persist
+import           Database.Persist.Postgresql
+import           GHC.Int
+import           Model
 
 connStr = "host=localhost dbname=Astrozodiak user=vladimirgorbenko password=H4d3yl8x port=5432"
 
 openConn :: IO ConnectionPool
-openConn = putStrLn "start" >> (runStdoutLoggingT $ createPostgresqlPool connStr 10)
+openConn = putStrLn "start" >> runStdoutLoggingT (createPostgresqlPool connStr 10)
 
 closeConn :: ConnectionPool -> IO ()
 closeConn pool = do
