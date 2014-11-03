@@ -6,6 +6,7 @@ module Handler.Api (getApiR) where
 
 import Handler.Common (Status(..), StatusCode(Success,NoCmd,UnsupportedCmd,UnhandledException))
 import Handler.DreamBook (dreamBookAutocomplete, getDreamBook)
+import Handler.Tests (getTests, getTest)
 
 import Yesod.Core.Types (HandlerT(HandlerT), unHandlerT)
 import Data.Text (Text, pack, append)
@@ -24,7 +25,9 @@ secondCommand = return $ toJSON ("2 command"::String)
 
 handlerByCmd :: Text -> Maybe (Handler Value)
 handlerByCmd "parse/dreambookautocomplete" = Just dreamBookAutocomplete
-handlerByCmd "parse/getdream" = Just getDreamBook
+handlerByCmd "parse/getdream"              = Just getDreamBook
+handlerByCmd "parse/gettestslist"          = Just getTests
+handlerByCmd "parse/gettest"               = Just getTest
 handlerByCmd "1" = Just firstCommand
 handlerByCmd "2" = Just secondCommand
 handlerByCmd _ = Nothing

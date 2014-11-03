@@ -16,4 +16,23 @@ Dream
     type Text
     deriving Eq Ord Show
 
+Test
+    name Text
+    deriving Eq Ord Show
+
+Quest
+    name Text
+    owner TestId
+
+Answer
+    text Text
+    pointes Int
+    owner QuestId
+
+TestResult
+    min Int
+    max Int
+    result Text
+    owner TestId
+
  -- By default this file is used in Model.hs (which is imported by Foundation.hs)

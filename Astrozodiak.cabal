@@ -23,6 +23,7 @@ library
                      Handler.Api
                      Handler.Common
                      Handler.DreamBook
+                     Handler.Tests
 
     if flag(dev) || flag(library-only)
         cpp-options:   -DDEVELOPMENT

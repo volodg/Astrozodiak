@@ -27,3 +27,14 @@ instance ToJSON Dream where
         , "context" .= context
         , "type"    .= dreamTypeFld
         ]
+
+instance ToJSON Quest where
+    toJSON (Quest name _) = object
+        [ "name" .= name ]
+
+instance ToJSON TestResult where
+    toJSON (TestResult minV maxV result _) = object
+        [ "min"    .= minV
+        , "max"    .= maxV
+        , "result" .= result
+        ]
