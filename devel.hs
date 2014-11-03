@@ -1,14 +1,15 @@
-{-# LANGUAGE CPP #-}
+{-# LANGUAGE CPP            #-}
 {-# LANGUAGE PackageImports #-}
-import "Astrozodiak" Application (getApplicationDev)
-import Network.Wai.Handler.Warp
-    (runSettings, defaultSettings, setPort)
-import Control.Concurrent (forkIO, threadDelay)
-import System.Directory (doesFileExist, removeFile)
-import System.Exit (exitSuccess)
+import           "Astrozodiak" Application              (getApplicationDev)
+import           Control.Concurrent       (forkIO, threadDelay)
+import           Network.Wai.Handler.Warp (defaultSettings, runSettings,
+                                           setPort)
+import           System.Directory         (doesFileExist, removeFile)
+import           System.Exit              (exitSuccess)
 
 #ifndef mingw32_HOST_OS
-import System.Posix.Signals (installHandler, sigINT, Handler(Catch))
+import           System.Posix.Signals     (Handler (Catch), installHandler,
+                                           sigINT)
 #endif
 
 main :: IO ()

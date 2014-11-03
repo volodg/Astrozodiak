@@ -1,29 +1,28 @@
-{-# LANGUAGE OverloadedStrings     #-}
-{-# LANGUAGE TypeFamilies          #-}
-{-# LANGUAGE ScopedTypeVariables   #-}
 {-# LANGUAGE FlexibleContexts      #-}
+{-# LANGUAGE FlexibleInstances     #-}
 {-# LANGUAGE GADTs                 #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE OverloadedStrings     #-}
+{-# LANGUAGE ScopedTypeVariables   #-}
+{-# LANGUAGE TypeFamilies          #-}
 
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Handler.Tests (getTests, getTest) where
 
---import Database.Esqueleto.Internal.Sql (unsafeSqlBinOp)
-import Foundation (Handler)
-import Text.Read (readMaybe)
---import Data.Maybe (fromMaybe)
-import Data.Text (Text, unpack) --, pack, append)
-import Prelude hiding (head, init, last, readFile, tail, writeFile)
-import Yesod (Value, ToJSON, (.=), object, toJSON, returnJson, lookupGetParam, runDB)
+import qualified Data.Map           as Map
+import           Data.Text          (Text, unpack)
 import qualified Database.Esqueleto as E
+import           Foundation         (Handler)
 import           GHC.Int
-import qualified Data.Map as Map
-
-import Handler.Common (Status(..), StatusCode(InvalidParameters))
-
-import Model
+import           Handler.Common     (Status (..),
+                                     StatusCode (InvalidParameters))
+import           Model
+import           Prelude            hiding (head, init, last, readFile, tail,
+                                     writeFile)
+import           Text.Read          (readMaybe)
+import           Yesod              (ToJSON, Value, lookupGetParam, object,
+                                     returnJson, runDB, toJSON, (.=))
 
 instance ToJSON (E.Value TestId, E.Value Text) where
     toJSON (E.Value testId, E.Value name) = object
@@ -60,7 +59,7 @@ instance ToJSON QuestNameWithAnswers where
 
 -- TODO test and make faster
 questAnswerRawTransform :: [(E.Entity Quest, E.Entity Answer)] -> [QuestNameWithAnswers]
-questAnswerRawTransform raws = 
+questAnswerRawTransform raws =
     Map.foldWithKey toArr [] dict where
         addEl dictAcc (E.Entity k1 v1, E.Entity _ v2) = Map.alter (appendAnswer v2) (RecordWithKey (E.fromSqlKey k1) v1) dictAcc where
             appendAnswer answer answers = Just $ case answers of
@@ -73,7 +72,8 @@ sqlQuests :: Int64 -> Handler [QuestNameWithAnswers]
 sqlQuests testId = do
     entities <- runDB $ E.select $
                     E.from $ \(quest, answer) -> do
-                        E.where_ $ quest E.^. QuestOwner E.==. E.valkey testId E.&&. answer E.^. AnswerOwner E.==. quest E.^. QuestId
+                        E.where_ $ quest E.^. QuestOwner E.==. E.valkey testId E.&&.
+                         answer E.^. AnswerOwner E.==. quest E.^. QuestId
                         E.orderBy [E.asc (quest E.^. QuestId)]
                         return (quest, answer)
 
