@@ -74,6 +74,7 @@ library
                  , esqueleto                     == 2.1.0
                  , exceptions                    == 0.6.1
                  , blaze-markup                  == 0.6.1.1
+                 , containers                    == 0.5.5.1
 
     -- see https://github.com/yesodweb/yesod/issues/814
     if !os(windows)

@@ -38,3 +38,9 @@ instance ToJSON TestResult where
         , "max"    .= maxV
         , "result" .= result
         ]
+
+instance ToJSON Answer where
+    toJSON (Answer text points _) = object
+        [ "text"   .= text
+        , "points" .= points
+        ]
